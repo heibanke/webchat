@@ -1,0 +1,11 @@
+<html><body>
+<div color="red">{{error}}</div>
+<form action="/login" method="post">{% module xsrf_form_html()%}
+                   name:<input type="text" name="name"> 
+                   password:<input type="password" name="password">
+                   <input type="submit" value="Sign in">
+                   
+                   
+                   
+</form>
+</body></html>
