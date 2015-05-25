@@ -1,40 +1,4 @@
-// Copyright 2009 FriendFeed
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
 
-$(document).ready(function() {
-    if (!window.console) window.console = {};
-    if (!window.console.log) window.console.log = function() {};
-
-    $("#messageform").live("submit", function() {
-        newMessage($(this));
-        return false;
-    });
-    $("#messageform").live("keypress", function(e) {
-        if (e.keyCode == 13) {
-            newMessage($(this));
-            return false;
-        }
-    });
-    $("#message").select();
-    updater.start();
-});
-
-function newMessage(form) {
-    var message = form.formToDict();
-    updater.socket.send(JSON.stringify(message));
-    form.find("input[type=text]").val("").select();
-}
 
 jQuery.fn.formToDict = function() {
     var fields = this.serializeArray();
@@ -46,23 +10,72 @@ jQuery.fn.formToDict = function() {
     return json;
 };
 
-var updater = {
-    socket: null,
 
-    start: function() {
-        var url = "ws://" + location.host + "/chatsocket";
-        updater.socket = new WebSocket(url);
-        updater.socket.onmessage = function(event) {
-            updater.showMessage(JSON.parse(event.data));
+    $(function() {
+      var conn = null;
+      function log(msg) {
+        var control = $('#log');
+        control.html(control.html() + msg + '<br/>');
+        control.scrollTop(control.scrollTop() + 1000);
+      }
+      function connect() {
+        disconnect();
+        var transports = ["websocket","xhr-streaming","iframe-eventsource","iframe-htmlfile","xhr-polling","iframe-xhr-polling"];
+        conn = new SockJS('http://' + window.location.host + '/chat', transports);
+        log('Connecting...');
+        conn.onopen = function() {
+          log('Connected.');
+          update_ui();
+        };
+        conn.onmessage = function(e) {
+          log(e.data);
+        };
+        conn.onclose = function() {
+          log('Disconnected.');
+          conn = null;
+          update_ui();
+        };
+      }
+      
+      
+      function disconnect() {
+        if (conn != null) {
+          log('Disconnecting...');
+          conn.close();
+          conn = null;
+          update_ui();
         }
-    },
-
-    showMessage: function(message) {
-        var existing = $("#m" + message.id);
-        if (existing.length > 0) return;
-        var node = $(message.html);
-        node.hide();
-        $("#inbox").append(node);
-        node.slideDown();
-    }
-};
+      }
+      
+      //when conn have message or status change, update
+      function update_ui() {
+        var msg = '';
+        if (conn == null || conn.readyState != SockJS.OPEN) {
+          $('#status').text('disconnected');
+          $('#connect').text('Connect');
+        } else {
+          $('#status').text('connected (' + conn.protocol + ')');
+          $('#connect').text('Disconnect');
+        }
+      }
+      
+      //connect or disconnect
+      $('#connect').click(function() {
+        if (conn == null) {
+          connect();
+        } else {
+          disconnect();
+        }
+        update_ui();
+        return false;
+      });
+      
+      // submit
+      $('form').submit(function() {
+        var message = $('#chatform').formToDict();
+        //log('Sending: ' + text);
+        conn.send(JSON.stringify(message));
+        $('#text').val('').focus();
+        return false;
+      });
+    });
