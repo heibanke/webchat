@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-  
 
-
+import redis
 import logging
 import tornado.escape
 import tornado.ioloop
@@ -13,6 +13,8 @@ import datetime
 from tornado.web import decode_signed_value
 from tornado.options import define, options
 import sockjs.tornado
+
+db = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 define("port", default=8888, help="run on the given port", type=int)
 
@@ -35,7 +37,7 @@ class MainHandler(BaseHandler):
             self.redirect("/login")
             return
         name = tornado.escape.xhtml_escape(self.current_user)
-        self.render("index.html", messages=ChatConnection.cache, name=name)
+        self.render("index.html", messages=db.lrange('messages',-100,-1), name=name)
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -62,9 +64,6 @@ class LogoutHandler(BaseHandler):
 
 class ChatConnection(sockjs.tornado.SockJSConnection):
     participants = set()
-    cache = []
-    cache_size = 200
-
 
     def on_open(self,info):
         self.broadcast(self.participants, info_get_secure_cookie(info,"user")+" joined.")   
@@ -80,9 +79,7 @@ class ChatConnection(sockjs.tornado.SockJSConnection):
         parsed = tornado.escape.json_decode(message)
         #logging.info("got message %r, %s", message, parsed)
         chat = "%s:%s (--%s)"%(parsed["username"],parsed["text"],datetime.datetime.now().ctime())
-        ChatConnection.cache.append(chat)
-        if len(ChatConnection.cache) > ChatConnection.cache_size:
-            ChatConnection.cache = ChatConnection.cache[-ChatConnection.cache_size:]        
+        db.rpush('messages',chat)
         self.broadcast(self.participants, chat)
 
 
