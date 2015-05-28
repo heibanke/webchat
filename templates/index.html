@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Tornado Chat Demo</title>
+    <title>龙龙的聊天室</title>
     <link rel="stylesheet" href="{{ static_url("chat.css") }}" type="text/css"/>
   </head>
   <body><div>{{name}}<p><a href="/logout">exit</a></p></div>
@@ -12,7 +12,7 @@
         </div>
         <div id="log" style="width: 60em; height: 40em; overflow:auto; border: 1px solid black">
         {% for message in messages %}
-          {{message}}<br>
+          {{message}}<br><br>
         {% end %}        
         </div>
         <form id="chatform">
