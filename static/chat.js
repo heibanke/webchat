@@ -11,71 +11,95 @@ jQuery.fn.formToDict = function() {
 };
 
 
-    $(function() {
-      var conn = null;
-      function log(msg) {
-        var control = $('#log');
-        control.html(control.html() + msg + '<br/>');
-        control.scrollTop(control.scrollTop() + 1000);
+
+$(function() {
+  var conn = null;
+  var old_title = document.title
+  var flag=false;
+  
+  function log(msg) {
+    var control = $('#log');
+    control.html(control.html() + msg + '<br/>');
+    control.scrollTop(control.scrollTop() + 1000);
+  }
+  
+  function newMsgCount(){
+      if(flag){
+        flag=false;
+        document.title='【新消息】';
+      }else{
+        flag=true;
+        document.title='【　　　】';
       }
-      function connect() {
-        disconnect();
-        var transports = ["websocket","xhr-streaming","iframe-eventsource","iframe-htmlfile","xhr-polling","iframe-xhr-polling"];
-        conn = new SockJS('http://' + window.location.host + '/chat', transports);
-        log('Connecting...');
-        conn.onopen = function() {
-          log('Connected.');
-          update_ui();
-        };
-        conn.onmessage = function(e) {
-          log(e.data);
-        };
-        conn.onclose = function() {
-          log('Disconnected.');
-          conn = null;
-          update_ui();
-        };
-      }
-      
-      
-      function disconnect() {
-        if (conn != null) {
-          log('Disconnecting...');
-          conn.close();
-          conn = null;
-          update_ui();
-        }
-      }
-      
-      //when conn have message or status change, update
-      function update_ui() {
-        var msg = '';
-        if (conn == null || conn.readyState != SockJS.OPEN) {
-          $('#status').text('disconnected');
-          $('#connect').text('Connect');
-        } else {
-          $('#status').text('connected (' + conn.protocol + ')');
-          $('#connect').text('Disconnect');
-        }
-      }
-      
-      //connect or disconnect
-      $('#connect').click(function() {
-        if (conn == null) {
-          connect();
-        } else {
-          disconnect();
-        }
+
+  }
+  
+  function connect() {
+    disconnect();
+    var transports = ["websocket","xhr-streaming","iframe-eventsource","iframe-htmlfile","xhr-polling","iframe-xhr-polling"];
+    conn = new SockJS('http://' + window.location.host + '/chat', transports);
+    log('Connecting...');
+    conn.onopen = function() {
+        log('Connected.');
         update_ui();
-        return false;
-      });
-      
-      // submit
-      $('form').submit(function() {
-        var message = $('#chatform').formToDict();
-        //log('Sending: ' + text);
-        conn.send(JSON.stringify(message));
-        $('#text').val('').focus();
-        return false;
-      });
-    });
+    };
+    conn.onmessage = function(e) {
+        log(e.data);
+        if(document.title==old_title){
+            newMsgCount();
+            interval = window.setInterval('newMsgCount()',380);
+            window.onmouseover = function (e) {
+                document.title = old_title;
+                window.clearInterval(interval);
+            }
+        }
+    };
+    conn.onclose = function() {
+        log('Disconnected.');
+        conn = null;
+        update_ui();
+    };
+  }
+  
+  
+  function disconnect() {
+    if (conn != null) {
+        log('Disconnecting...');
+        conn.close();
+        conn = null;
+        update_ui();
+    }
+  }
+  
+  //when conn have message or status change, update
+  function update_ui() {
+    var msg = '';
+    if (conn == null || conn.readyState != SockJS.OPEN) {
+        $('#status').text('disconnected');
+        $('#connect').text('Connect');
+    } else {
+        $('#status').text('connected (' + conn.protocol + ')');
+        $('#connect').text('Disconnect');
+    }
+  }
+  
+  //connect or disconnect
+  $('#connect').click(function() {
+    if (conn == null) {
+        connect();
+    } else {
+        disconnect();
+    }
+    update_ui();
+    return false;
+  });
+  
+  // submit
+  $('form').submit(function() {
+    var message = $('#chatform').formToDict();
+    //log('Sending: ' + text);
+    conn.send(JSON.stringify(message));
+    $('#text').val('').focus();
+    return false;
+  });
+});
