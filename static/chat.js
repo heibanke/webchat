@@ -45,14 +45,19 @@ $(function() {
     };
     conn.onmessage = function(e) {
         log(e.data);
-        if(document.title==old_title){
+        var hidden = true;
+        if(document.hidden!=undefine){
+            hidden = document.hidden
+        }
+        if(document.title==old_title && hidden){
             newMsgCount();
-            interval = window.setInterval('newMsgCount()',380);
+            var interval = window.setInterval('newMsgCount()',380);
             window.onmouseover = function (e) {
                 document.title = old_title;
                 window.clearInterval(interval);
             }
         }
+        
     };
     conn.onclose = function() {
         log('Disconnected.');
