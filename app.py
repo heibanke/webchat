@@ -289,12 +289,13 @@ urls = [
         (r"/login",LoginHandler),
         (r"/logout",LogoutHandler)] + ChatRouter.urls
 
-settings = dict(
-        template_path = os.path.join(os.path.dirname(__file__), "templates"),
-        static_path = os.path.join(os.path.dirname(__file__), "static"),
-        cookie_secret = 'werwerwAW15Wwr-wrwe==dssdtfrwerter2t12',
-        debug=True,
-        );
+SETTINGS = dict(cookie_secret="werwerwAW15Wwr-wrwe==dssdtfrwerter2t12",
+            login_url="/login",
+            template_path=os.path.join(os.path.dirname(__file__), "templates"),
+            static_path=os.path.join(os.path.dirname(__file__), "static"),
+            xsrf_cookies=True,
+            debug=True)
+
 
 isLog = True
 
@@ -302,7 +303,7 @@ def main():
     # printrooms = tornado.ioloop.PeriodicCallback(printAllRooms, GameSocketHandler.active_timeout)
     # printrooms.start()
     tornado.options.parse_command_line() # -log_file_prefix=your complete path/test_log@8091.log
-    application = web.Application(urls, **settings)
+    application = web.Application(urls, **SETTINGS)
     application.listen(options.port, options.address)
     # tornado.autoreload.start(tornado.ioloop.IOLoop.instance()) # add this to enable autorestart
     tornado.ioloop.IOLoop.instance().start()
