@@ -1,29 +1,86 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>龙龙的聊天室</title>
-    <link rel="stylesheet" href="{{ static_url("chat.css") }}" type="text/css"/>
-  </head>
-  <body><div>{{name}}<p><a href="/logout">exit</a></p></div>
-    <div id="body">
-        <div>
-          <a id="connect" href="#">Connect</a>&nbsp;|&nbsp;Status: <span id="status">disconnected</span>
-        </div>
-        <div id="log" style="width: 60em; height: 40em; overflow:auto; border: 1px solid black">
-        {% for message in messages %}
-          {{message}}<br><br>
-        {% end %}        
-        </div>
-        <form id="chatform">
-        {% module xsrf_form_html()%}
-  <input id="text" type="text" name="text"/>
-  <input type="hidden" name="username" value={{name}} />
-          <input type="submit" />
-        </form>
+{% extends "base.html" %}
+
+{% block css-block %}
+<style type="text/css">
+.gamemove-status {
+    background-image: url("{{static_url('img/face-smile.png')}}");
+}
+</style>
+{% end %}
+
+{% block container-fluid %}
+
+    <div class="container-fluid">
+    	<div class="row-fluid">
+    		<div class="span9" id="game-div">
+    			<div id="gamebar-div">
+    				<div id="piece_sign_top" class=""><img id="his_status_img" src="{{static_url('img/help-browser-4.png')}}" /></div>
+
+    				<div id="piece_sign_bottom" class=""><img id="my_status_img" src="{{static_url('img/help-browser-4.png')}}" /></div>
+    			</div>
+    			<canvas id="game-canvas" width="460px" height="460px" >糟糕，好像你的浏览器不支持canvas。换个谷歌浏览器再来试试吧</canvas>
+    		</div>
+    		<div class="span3" id="gamestatus-div">
+                <div id="status-div">
+                    <h5>说明</h5>
+                    <blockquote>
+                        <span>将当前地址发给朋友，邀请他一起玩吧</span>
+                    </blockquote>
+                    <blockquote>
+                        <span>链接参数规则为：<br />/room-房间名</span>
+                    </blockquote>
+
+                    <h5>当前状态</h5>
+                    <blockquote>
+                        <span id="status-span" ></span>
+                    </blockquote>
+                    <h5>聊天</h5>
+                    <div id="chat-div">
+                        <ul>
+
+                        </ul>
+
+                        <input title="" type="text" class="" id="chat-input" placeholder="对他说点什么吧" onkeydown="javascript: if(event.keyCode==13) sendchat(); ">
+                    </div>
+                </div>
+    		</div>
+    	</div>
+
     </div>
-    <script src="{{static_url("jquery.min.js")}}" type="text/javascript"></script>
-    <script src="http://cdn.jsdelivr.net/sockjs/0.3/sockjs.min.js"></script>
-    <script src="{{ static_url("chat.js") }}" type="text/javascript"></script>
-  </body>
-</html>
+    </div>
+
+    <div id="alert-model-dom" class="modal hide fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 id="alert-title">游戏已结束</h3>
+        </div>
+        <div class="modal-body">
+            <p id="alert-body"></p>
+        </div>
+        <div class="modal-footer">
+            <a onclick="$('#alert-model-dom').modal('hide');return false;" href="javascript:;" class="btn">关闭</a>
+        </div>
+    </div>
+
+{% end %}
+
+{% block javascript-block %}
+
+    <script src="{{static_url('js/jquery-1.8.3.min.js')}}"></script>
+    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+    <script src="{{static_url('js/Game.js')}}"></script>
+    <script type="text/javascript">
+    	var gamec = new GameCanvas();
+        var is_waiting = {{ is_waiting and 'true' or 'false' }};
+        var my_piece = {{ my_piece_id }};
+        var his_piece = {{ my_piece_id == 1 and 2 or 1}};
+        var room_name = '{{ cur_room.room_name }}';
+        var room_status = {{ cur_room.status }};
+        var game_pieces = new Array(); 
+        var status_imgs = ["{{static_url('img/black.png')}}", "{{static_url('img/white.png')}}"];
+        var gamesocket;
+        var wsurl = "ws://"+location.host+"/gs?room={{ cur_room.room_name }}&up={{my_piece_id}}";
+
+    </script>
+
+{% end %}

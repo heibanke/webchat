@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>龙龙的聊天室</title>
+    <link rel="stylesheet" href="{{ static_url("chat.css") }}" type="text/css"/>
+  </head>
+  <body><div>{{name}}<p><a href="/logout">exit</a></p></div>
+    <div id="body">
+        <div>
+          <a id="connect" href="#">Connect</a>&nbsp;|&nbsp;Status: <span id="status">disconnected</span>
+        </div>
+        <div id="log" style="width: 60em; height: 40em; overflow:auto; border: 1px solid black">
+        {% for message in messages %}
+          {{message}}<br><br>
+        {% end %}        
+        </div>
+        <form id="chatform">
+        {% module xsrf_form_html()%}
+  <input id="text" type="text" name="text"/>
+  <input type="hidden" name="username" value={{name}} />
+          <input type="submit" />
+        </form>
+    </div>
+    <script src="{{static_url("jquery.min.js")}}" type="text/javascript"></script>
+    <script src="http://cdn.jsdelivr.net/sockjs/0.3/sockjs.min.js"></script>
+    <script src="{{ static_url("chat.js") }}" type="text/javascript"></script>
+  </body>
+</html>

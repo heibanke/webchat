@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block container-fluid %}
+
+    <div class="container-fluid">
+    	<div class="row-fluid">
+    		<div class="span9" id="game-div">
+    			<div id="gamebar-div">
+    				<div id="piece_sign_top" class=""><img id="his_status_img" src="" /></div>
+    				<div id="piece_sign_bottom" class=""><img id="my_status_img" src="" /></div>
+    			</div>
+    			<canvas id="game-canvas" width="460px" height="460px" >糟糕，好像你的浏览器不支持canvas。换个谷歌浏览器再来试试吧</canvas>
+    		</div>
+    		<div class="span3" id="gamestatus-div">
+                <div id="status-div">
+                    <h3>说明</h3>
+                    <blockquote>
+                        <span>将当前地址发给朋友，邀请他一起玩吧</span>
+                    </blockquote>
+                    <blockquote>
+                        <span>链接参数规则为：<br />/room-房间名</span>
+                    </blockquote>
+
+                    <h3 id="status-h3">当前状态</h3>
+                    <blockquote>
+                        <span id="status-span" ></span>
+                    </blockquote>
+                </div>
+    		</div>
+    	</div>
+
+    </div>
+    </div>
+
+    <div id="alert-model-dom" class="modal hide fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 id="alert-title">游戏已结束</h3>
+        </div>
+        <div class="modal-body">
+            <p id="alert-body"></p>
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:$('#alert-model-dom').modal('hide')" class="btn">关闭</a>
+        </div>
+    </div>
+
+{% end %}
+
+{% block javascript-block %}
+
+    <script src="{{static_url('js/jquery-1.8.3.min.js')}}"></script>
+    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+    <script src="{{static_url('js/Game.js')}}"></script>
+    <script type="text/javascript">
+    	var gamec = new GameCanvas();
+        var is_waiting = {{ is_waiting and 'true' or 'false' }};
+        var my_piece = {{ my_piece_id }};
+        var his_piece = {{ my_piece_id == 1 and 2 or 1}};
+        var room_name = '{{ cur_room.room_name }}';
+        var room_status = {{ cur_room.status }};
+        var game_pieces = new Array(); 
+        var status_imgs = ["{{static_url('img/black.png')}}", "{{static_url('img/white.png')}}"];
+
+        for(i=0; i<=gamec.grid_count; i++){
+            game_pieces[i] = new Array();
+            for(j=0; j<=gamec.grid_count; j++){
+                game_pieces[i][j] = 0;
+            }
+        }
+
+        if(is_waiting ){
+            $('#game-canvas').css('cursor', 'default');
+        }
+        if(room_status==0){
+            $('#status-span').text('等待对方上线');
+        }else{
+            $('#status-span').text('游戏开始');
+        }
+
+        function getGridRowCol(pos){
+            var cursorx = pos[0];
+            var cursory = pos[1];
+            var start_col = Math.floor((cursorx-gamec.out_width) / gamec.margin);
+            var start_row = Math.floor((cursory-gamec.out_width) / gamec.margin);
+            if (((cursorx-gamec.out_width) % gamec.margin) > (gamec.margin/2)) {
+                start_col++;
+            }
+            if (((cursory-gamec.out_width) % gamec.margin) > (gamec.margin/2)) {
+                start_row++;
+            }
+            return [start_row, start_col]
+        }
+    	function getCurPosition(e) {  
+		    var x, y; 
+		    if (e.pageX != undefined && e.pageY != undefined) {  
+		      x = e.pageX;
+		      y = e.pageY; 
+		    } else {  
+		      x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+		      y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+		    }  
+		    x -= gamec.canvas.offsetLeft;
+		    y -= gamec.canvas.offsetTop;
+		    return [x, y];
+	  	} 
+
+	  	function canvasClickHandler(e){
+            if(is_waiting){
+                return false;
+            }
+	  		var canvas = document.getElementById('game-canvas');
+	  		var pos = getCurPosition(e);
+			rowcol = getGridRowCol(pos);
+            row = rowcol[0]
+            col = rowcol[1]
+            if(game_pieces[row][col] != 0){
+                return false;
+            }
+            $.post("/step?_t="+ new Date().getTime(), { pos: rowcol.join(','), room: room_name, up: my_piece } , function(data){
+                if(data.result){
+                    gamec.drawPiece(rowcol[0], rowcol[1], my_piece);
+                    is_waiting = true;
+                    game_pieces[rowcol[0]][rowcol[1]] = my_piece;
+                    $('#game-canvas').css('cursor', 'default');
+                    $('#piece_sign_bottom').removeClass('arrow-2-right');
+                    $('#piece_sign_top').addClass('arrow-2-right');
+                }else{
+                    alert(data.msg);
+                }
+            });
+	  	} 
+        //哪一方该下棋的标记
+        function initStartSign(){
+            $('#piece_sign_top').removeClass('arrow-2-right');
+            $('#piece_sign_bottom').removeClass('arrow-2-right');
+            var piece_signs = $('#piece_sign_top');
+            if(my_piece == 1){
+                piece_signs = $('#piece_sign_bottom');   
+            }
+            piece_signs.addClass('arrow-2-right');
+        }
+
+        function getGamePoll(){
+            $.get('/poll?room='+room_name+'&up='+my_piece+'&_t='+ new Date().getTime(), function(data){
+                darr = data.data.split(',')
+                if(darr[0] == 'start'){
+                    is_waiting = false;
+                    $('#status-span').text('对方上线，游戏开始');
+                    gamec.canvas.width = gamec.canvas.width;
+                    gamec.drawGrid();
+                    $('#his_status_img').attr('src', status_imgs[his_piece-1]);
+                    if(my_piece == 1){  //黑先白后
+                        $('#game-canvas').css('cursor', 'pointer');
+                    }
+                    initStartSign();
+                    getGamePoll();
+                }else if (darr[0] == 'off'){
+                    is_waiting = true;
+                    $('#status-span').text('对方离线');
+                    $('#game-canvas').css('cursor', 'default');
+                    $('#piece_sign_top').removeClass('arrow-2-right');
+                    $('#piece_sign_bottom').removeClass('arrow-2-right');
+                    $('#alert-title').text('对方离线');
+                    $('#alert-model-dom').data('id', 0).modal('show');
+                    getGamePoll();
+                }else if (darr[0] == 'end'){
+                    is_waiting = true;
+                    $('#status-span').text('游戏结束');
+                    $('#piece_sign_top').removeClass('arrow-2-right');
+                    $('#piece_sign_bottom').removeClass('arrow-2-right');
+                    $('#game-canvas').css('cursor', 'default'); 
+                    pid = parseInt(darr[1])
+                    if (pid > 0 && pid != my_piece){
+                        row = parseInt(darr[2]);
+                        col = parseInt(darr[3]);
+                        gamec.drawPiece(row, col, his_piece);
+                        game_pieces[row][col] = his_piece;                  
+                    }
+                    $('#alert-title').text('游戏结束');
+                    $('#alert-model-dom').data('id', 0).modal('show');
+                }else{  //对方下棋
+                    pos = data.data.split(',')
+                    row = parseInt(pos[0]);
+                    col = parseInt(pos[1]);
+                    gamec.drawPiece(row, col, his_piece);
+                    game_pieces[row][col] = his_piece;
+                    $('#game-canvas').css('cursor', 'pointer');
+                    $('#piece_sign_top').removeClass('arrow-2-right');
+                    $('#piece_sign_bottom').addClass('arrow-2-right');
+                    is_waiting = false;
+                    getGamePoll();
+                }
+            });
+        }
+        $(document).ready(function () {         
+            gamec.canvas.addEventListener("click", canvasClickHandler, false);
+            gamec.drawGrid();
+            getGamePoll();
+            $('#my_status_img').attr('src', status_imgs[my_piece-1]);
+            if(room_status != 0){
+               $('#his_status_img').attr('src', status_imgs[his_piece-1]);
+                initStartSign();
+            }
+
+            $.get('/alive?room='+room_name+'&up='+my_piece+'&_t='+ new Date().getTime(), function(data){
+                return true;
+            });            
+        });
+    </script>
+
+{% end %}
