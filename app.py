@@ -61,7 +61,10 @@ class GameSocketHandler(tornado.websocket.WebSocketHandler):
     socket_handlers = {}   #房间名-1:GameSocketHandler 一个房间每个人有一个值, 1用户订阅 room-1
     all_rooms = {}  # 房间名:GameRoom
     active_timeout = 600000 # 超时时间，超时后关闭房间
-
+    
+    def check_origin(self, origin):  
+        return True
+    
     def open(self):
 
         self.room_name = self.get_argument('room')
