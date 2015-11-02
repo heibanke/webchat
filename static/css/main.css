@@ -1,32 +1,28 @@
 body {
-	padding-top: 60px;
+	padding-top: 10px;
 	padding-bottom: 40px;
 }
 .footer {
-	text-align: right;
-	padding: 40px 200px 0 160px;
+	text-align: center;
 }
 .row-fluid {
-	width: 800px;
+	width: 600px;
 	margin: 0 auto;
 }
 .container-fluid {
-	padding: 0px 200px 0 160px;
-	min-height: 400px;
+	min-height: 300px;
 }
+
+
 #game-div {
-	background-color: #DCEAF4;
+	background-color: #CD9B1D;
 	min-height: 450px;
-	border-radius: 10px;
 }
 #gamestatus-div {
-	min-height: 450px;
-	border-radius: 5px;
+	min-height: 400px;
 	font-size: 12px;
 }
 #game-canvas {
-	float: right;
-	margin: 4px;
 	cursor: pointer;
 }
 #gamebar-div{
