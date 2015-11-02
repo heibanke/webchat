@@ -12,7 +12,8 @@
 
     <div class="container-fluid">
     	<div class="row-fluid">
-    		<div class="span9" id="game-div">
+
+    		<div  id="game-div">
     			<div id="gamebar-div">
     				<div id="piece_sign_top" class=""><img id="his_status_img" src="{{static_url('img/help-browser-4.png')}}" /></div>
 
@@ -20,14 +21,11 @@
     			</div>
     			<canvas id="game-canvas" width="460px" height="460px" >糟糕，好像你的浏览器不支持canvas。换个谷歌浏览器再来试试吧</canvas>
     		</div>
-    		<div class="span3" id="gamestatus-div">
+    		<div  id="gamestatus-div">
                 <div id="status-div">
                     <h5>说明</h5>
                     <blockquote>
-                        <span>将当前地址发给朋友，邀请他一起玩吧</span>
-                    </blockquote>
-                    <blockquote>
-                        <span>链接参数规则为：<br />/room-房间名</span>
+                        <span>将当前地址发给朋友，邀请他一起玩吧<br>链接参数规则为：http://52.69.5.218/room-房间名</span>
                     </blockquote>
 
                     <h5>当前状态</h5>
@@ -79,7 +77,7 @@
         var game_pieces = new Array(); 
         var status_imgs = ["{{static_url('img/black.png')}}", "{{static_url('img/white.png')}}"];
         var gamesocket;
-        var wsurl = "ws://"+location.host+"/gs?room={{ cur_room.room_name }}&up={{my_piece_id}}";
+        var wsurl = "ws://"+window.location.host+"/gs?room={{ cur_room.room_name }}&up={{my_piece_id}}";
 
     </script>
 

@@ -4,42 +4,53 @@
 {% block container-fluid %} 
 
 <div class="container-fluid">
+<div class="row-fluid">
+    <form class="form-search" id="enter-room-form">
+        <p>您可以加入空闲房间或自己创建房间</p>
+        <input title="" type="text" class="input-medium search-query" id="room-name-input" placeholder="输入房间名" onkeydown="if(event.keyCode==13) {document.getElementById('enter-room-btn').click();return false;}">
+        <button id="enter-room-btn" type="button" class="btn" onclick="javascript:window.location = '/room-'+$('#room-name-input').val(); return false;">进入</button>
+    </form>
 
-  <form class="form-search" id="enter-room-form">
-    <span>您也可以创建房间</span>
-    <input title="" type="text" class="input-medium search-query" id="room-name-input" placeholder="输入房间名" onkeydown="if(event.keyCode==13) {document.getElementById('enter-room-btn').click();return false;}">
-    <button id="enter-room-btn" type="button" class="btn" onclick="javascript:window.location = '/room-'+$('#room-name-input').val(); return false;">进入</button>
-  </form>
+    <h3 class="rooms-title">当前空闲的房间</h3>
+    <table class="table table-hover" id="rooms-table">
 
-  <h3 class="rooms-title">当前空闲的房间</h3>
-  <table class="table table-hover" id="rooms-table">
-      <thead><tr><th>序号</th><th>房间</th></tr></thead>
-      <tbody>
         {% set count = 1 %}
         {% for (name, room) in rooms.items() %}
           {% if len(room.user_piece_ids) < 2 %}
-          </tr><td>{{ count }}</td> <td><a href='/room-{{ escape(room.room_name) }}'>{{ escape(room.room_name) }}</a> </td></tr>
-          {% set count = count+1 %}
+              {%if count==1%}
+                <thead><tr><th>序号</th><th>房间</th></tr></thead>
+                <tbody>            
+              {%end%}
+          
+              </tr><td>{{ count }}</td> <td><a href='/room-{{ escape(room.room_name) }}'>{{ escape(room.room_name) }}</a> </td></tr>
+              {% set count = count+1 %}
           {% end %}
         {% end %}
-
-      </tbody>
-  </table>
+        {%if count == 1%}
+            <tbody></tr><td>目前无房间</td></tr>
+        {%end%}
+        </tbody>
+    </table>
 
     <h3 class="rooms-title">正在游戏的房间</h3>
     <table class="table table-hover" id="rooms-table">
-        <thead><tr><th>序号</th><th>房间</th></tr></thead>
-        <tbody>
           {% set count = 1 %}
           {% for (name, room) in rooms.items() %}
             {% if len(room.user_piece_ids) == 2 %}
-            </tr><td>{{ count }}</td> <td>{{ escape(room.room_name) }} </td></tr>
-            {% set count = count+1 %}
-            {% end %}
+                {%if count==1%}
+                  <thead><tr><th>序号</th><th>房间</th></tr></thead>
+                  <tbody>            
+                {%end%}
+                </tr><td>{{ count }}</td> <td>{{ escape(room.room_name) }} </td></tr>
+                {% set count = count+1 %}
+                {% end %}
           {% end %}
-
+          {%if count == 1%}
+            <tbody></tr><td>目前无房间</td></tr>
+          {%end%}
         </tbody>
     </table>
+</div>
 </div>
 
 

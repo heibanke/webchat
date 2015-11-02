@@ -13,23 +13,8 @@
 
 </head>
 <body id="mainbody">
-	<div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <a  href="/" class="brand" >在线五子棋对战</a>
-                <div class="nav-collapse" id="nav-collapse">
-                    <ul class="nav">
-                       <!--  <li><a href="javascript:;">关于</a></li> -->
-                    	<!-- <li><a href="javascript:;">人在线</a></li> -->
-                    	<li><a href="/rooms">共{{ all_rooms_count }}个房间</a></li>
-                      <li><a href="/">首页</a></li>
-                    </ul>
-                </div><!--/.nav-collapse -->
-            </div>
-      </div>
-  </div><!-- end  navbar-->
-
-
+  
+  <h3 style="text-align: center">在线五子棋对战</h3>
   {% block container-fluid %}
     <div class="container-fluid">
     </div>
@@ -46,7 +31,8 @@
     </p>
   </footer>
 
-  {% block javascript-block %}                      {% end %}
+  {% block javascript-block %}
+  {% end %}
 
 </body>
 </html>
