@@ -46,7 +46,7 @@ $(function() {
     conn.onmessage = function(e) {
         log(e.data);
         var hidden = true;
-        if(document.hidden!=undefine){
+        if(document.hidden!=undefined){
             hidden = document.hidden
         }
         if(document.title==old_title && hidden){

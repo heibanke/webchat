@@ -1,18 +1,31 @@
 var offline_timeout;
 
+
 var GameCanvas = function() {
 
 	this.PIECE_NONE = 0;
 	this.PIECE_BLACK = 1;
 	this.PIECE_WHITE = 2;
 
-	this.margin = 30;
 	this.grid_count = 15;
-	this.line_width = 0.2;
+	this.line_width = 0.5;
 	this.out_width = 5;
-	this.grid_width = this.margin * this.grid_count + 10; //460
+	
 
 	this.canvas = document.getElementById('game-canvas');
+    this.canvas.setAttribute("width", $(window).get(0).innerWidth-60); 
+    this.canvas.setAttribute("height", $(window).get(0).innerHeight-60);
+
+    if (this.canvas.width > this.canvas.height){
+        this.canvas.setAttribute("width",this.canvas.height);
+    }
+    else{
+        this.canvas.setAttribute("height",this.canvas.width);
+    }
+
+    this.margin = Math.floor((this.canvas.width-10)/this.grid_count);
+    this.grid_width = this.margin*this.grid_count+10;
+
 	this.context = this.canvas.getContext('2d');
 	
 	/**
@@ -21,7 +34,8 @@ var GameCanvas = function() {
 	 */
 	this.drawGrid = function() {
 		this.context.fillStyle = "#fff";
-		this.context.strokeStyle = "#22252B";
+		//this.context.strokeStyle = "#22252B";
+        this.context.strokeStyle = "#000000";
 		this.context.lineWidth = this.line_width;
 		this.context.beginPath();
 		for(i=0; i<=this.grid_count; i++) { //横线

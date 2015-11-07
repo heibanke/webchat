@@ -15,24 +15,26 @@
 
     		<div  id="game-div">
     			<div id="gamebar-div">
-    				<div id="piece_sign_top" class=""><img id="his_status_img" src="{{static_url('img/help-browser-4.png')}}" /></div>
+                    <div id="piece_sign_top" class=""><img id="his_status_img" src="{{static_url('img/help-browser-4.png')}}" /></div>
 
-    				<div id="piece_sign_bottom" class=""><img id="my_status_img" src="{{static_url('img/help-browser-4.png')}}" /></div>
-    			</div>
-    			<canvas id="game-canvas" width="460px" height="460px" >糟糕，好像你的浏览器不支持canvas。换个谷歌浏览器再来试试吧</canvas>
+                    <div id="piece_sign_bottom" class=""><img id="my_status_img" src="{{static_url('img/help-browser-4.png')}}" /></div>
+                    <div id="piece_float_none">
+                    </div>
+                </div>
+    			<canvas id="game-canvas"  >糟糕，好像你的浏览器不支持canvas。换个谷歌浏览器再来试试吧</canvas>
     		</div>
     		<div  id="gamestatus-div">
                 <div id="status-div">
-                    <h5>说明</h5>
+                    <h4>说明</h4>
                     <blockquote>
-                        <span>将当前地址发给朋友，邀请他一起玩吧<br>链接参数规则为：http://52.69.5.218/room-房间名</span>
+                        <p>将当前地址发给朋友，邀请他一起玩吧<br>链接参数规则为：http://52.69.5.218/room-房间名</p>
                     </blockquote>
 
-                    <h5>当前状态</h5>
+                    <h4>当前状态</h4>
                     <blockquote>
-                        <span id="status-span" ></span>
+                        <p id="status-span" ></p>
                     </blockquote>
-                    <h5>聊天</h5>
+                    <h4>聊天</h4>
                     <div id="chat-div">
                         <ul>
 

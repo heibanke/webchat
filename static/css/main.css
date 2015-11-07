@@ -1,12 +1,12 @@
 body {
 	padding-top: 10px;
 	padding-bottom: 40px;
+	text-align: center;
 }
 .footer {
 	text-align: center;
 }
 .row-fluid {
-	width: 600px;
 	margin: 0 auto;
 }
 .container-fluid {
@@ -15,7 +15,6 @@ body {
 
 
 #game-div {
-	background-color: #CD9B1D;
 	min-height: 450px;
 }
 #gamestatus-div {
@@ -23,19 +22,19 @@ body {
 	font-size: 12px;
 }
 #game-canvas {
+	background-color: #CD9B1D;
 	cursor: pointer;
 }
-#gamebar-div{
-	width: 120px;
-	min-height: 450px;
-	float: left;
+
+#piece_float_none{
+	float:none;
 }
 #piece_sign_top{
-	margin-top: 50px;
+	margin-top: 5px;
 	padding-left: 60px;
 }
 #piece_sign_bottom {
-	margin-top: 300px;
+	margin-top: 5px;
 	padding-left: 60px;
 }
 .gamemove-status {
